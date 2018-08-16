@@ -41,7 +41,8 @@ edit [a bookmark]
 import [bookmarks from Firefox]
 export [bookmarks to other formats]
 copyright
-help```
+help
+```
 
 ## Adding new bookmarks
 
