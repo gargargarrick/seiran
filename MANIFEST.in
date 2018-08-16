@@ -1,0 +1,6 @@
+include README
+include AUTHORS
+include LICENSE
+include CODE_OF_CONDUCT.md
+include icon.svg
+include seiran.svg
