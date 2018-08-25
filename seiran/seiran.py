@@ -181,8 +181,8 @@ def getFirefoxBookmarks():
             print("Duplicate found. Ignoring {i}.".format(i=i[1]))
         except sqlite3.OperationalError:
             print("Operational error")
-        print("Import complete!")
-        return
+    print("Import complete!")
+    return
 
 def getOneTabBookmarks():
     ## Get bookmarks from OneTab importer.
@@ -244,7 +244,7 @@ def main():
 
     ## Use with the command line or don't!
     if len(sys.argv) <= 1:
-        choice = input("Action? (add, del, list, search, edit, import, copyright, help) > ")
+        choice = input("Action? (add, del, list, search, edit, import, export, copyright, help) > ")
     else:
         choice = sys.argv[1]
 
@@ -298,7 +298,7 @@ def main():
     elif choice.lower() == "copyright":
         print("Copyright 2015-2018 Matthew 'garrick' Ellison. Released under the GNU GPL version 3.")
     elif choice.lower() == "help":
-        print("Available commands: add [a bookmark], del[ete a bookmark], list [all bookmarks], search [bookmarks], edit [a bookmark], import [bookmarks from Firefox], export [bookmarks to other formats], copyright, help")
+        print("Available arguments: add [a bookmark], del[ete a bookmark], list [all bookmarks], search [bookmarks], edit [a bookmark], import [bookmarks from other system], export [bookmarks to other formats], copyright, help")
     else:
         conn.close()
 
