@@ -29,7 +29,9 @@ That's all!
 
 ## How to run
 
-Open your terminal. Navigate to your Seiran folder and run `seiran.py` with Python 3. (For best security, I recommend installing and running Seiran in an encrypted volume.)
+Install Seiran (`python setup.py install`) and it will be added to your Python `Scripts` folder, `/bin`, etc. depending on your platform. If you like, add its location to your system path so you can use Seiran anywhere just by typing "seiran".
+
+If you run Seiran without arguments, it will ask what you want to do. You can also invoke it with the command you want (e.g. `seiran add`), to save time.
 
 Available commands:
 
