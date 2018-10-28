@@ -40,7 +40,7 @@ del[ete a bookmark]
 list [all bookmarks]
 search [bookmarks]
 edit [a bookmark]
-import [bookmarks from Firefox]
+import [bookmarks from various sources]
 export [bookmarks to other formats]
 copyright
 help
@@ -78,7 +78,7 @@ Although it's experimental, you can import a whole bunch of bookmarks at once wi
 
 When you use the `import` command, you'll first be prompted to make sure you really meant to do that -- it could take a long time and add quite a large number of bookmarks to your database (and may still have bugs as well). If you're OK with that, type `y` for yes.
 
-Next, Seiran supports importation from both Firefox (and derivatives, like IceCat) and the [OneTab](https://www.one-tab.com/) browser add-on. You'll be asked which one you want to import bookmarks from.
+Next, Seiran supports importation from existing Seiran databases, Firefox (and derivatives, like IceCat), the [OneTab](https://www.one-tab.com/) browser add-on. You'll be asked which one you want to import bookmarks from.
 
 ### Firefox et al.
 
@@ -101,6 +101,12 @@ Seiran will ask if this is a mobile browser's profile; say yes, and the importat
 Save the contents of OneTab's "Export URLs" into a plain text (.txt) file. When prompted by Seiran, copy and paste the path to the export file. Then the importation process will begin.
 
 Caveat: OneTab does not store dates in its export file, so those will not be preserved by Seiran. The date that you imported the bookmark will be used instead.
+
+### Seiran
+
+If you have another Seiran database and you want to combine it with your main one, this function will allow that. It is highly experimental and may ruin all the things. I am not responsible if you lose your bookmarks; make sure both databases are backed up before you attempt this.
+
+Seiran will prompt you for the **full path** to the database you want to import. Provide it and the importation process will begin.
 
 ## License
 
