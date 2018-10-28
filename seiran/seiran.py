@@ -199,6 +199,31 @@ def getOneTabBookmarks():
     print("Import complete!")
     return
 
+def getSeiranBookmarks():
+    ## Import bookmarks from an existing Seiran database.
+    print("Warning! This is not well-tested and may ruin everything.")
+    print("Back up your database before use!")
+    seiran_file = input("Enter the path to the Seiran database you want to copy. > ")
+    if seiran_file.lower() == "q":
+        print("Import cancelled.")
+        return
+    sconn = sqlite3.connect(seiran_file)
+    sc = sconn.cursor()
+    attach_main = "ATTACH DATABASE ? as x"
+    main_db_path = installToConfig()
+    main_db = (main_db_path,)
+    c.execute(attach_main,main_db)
+    attach_branch = "ATTACH DATABASE ? as y"
+    branch_db = (seiran_file,)
+    c.execute(attach_branch,branch_db)
+    c.execute("INSERT OR IGNORE INTO x.bookmarks SELECT * FROM y.bookmarks;")
+    conn.commit()
+    # except sqlite3.OperationalError:
+    #     print("Operational error")
+    print("Import complete!")
+    return
+    
+
 def exportBookmarks(format):
     c.execute("SELECT * from bookmarks")
     if format == "txt":
@@ -208,7 +233,11 @@ def exportBookmarks(format):
         template = "<p><a href={url}>{title}</a> ({folder}) [<time='{date}'>{date}</a>]</p>"
     bookmarks = []
     for i in c.fetchall():
-        bookmarks.append(template.format(title=i[0],url=i[1],date=i[2],folder=i[3]))
+        if i[0] == "":
+            title=i[1]
+        else:
+            title = i[0]
+        bookmarks.append(template.format(title=title,url=i[1],date=i[2],folder=i[3]))
     if format == "txt":
         bookmarks_write = "\n".join(bookmarks)
     elif format == "html":
@@ -275,12 +304,15 @@ def main():
     elif choice.lower() == "import":
         ic = input("Are you sure you want to import bookmarks? It might take a while. Back up your database first! (y/n) > ")
         if ic.lower() == "y" or ic.lower() == "yes":
-            importer_c = input("Import from Firefox-type browser or OneTab export? (firefox/onetab) > ")
+            importer_c = input("Import from Firefox-type browser, OneTab export, or another Seiran database? (firefox/onetab/seiran) > ")
             if importer_c == "firefox":
                 getFirefoxBookmarks()
                 return
             elif importer_c == "onetab":
                 getOneTabBookmarks()
+                return
+            elif importer_c == "seiran":
+                getSeiranBookmarks()
                 return
         else:
             print("OK, nothing will be copied.")
