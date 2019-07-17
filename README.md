@@ -29,9 +29,7 @@ That's all!
 
 ## How to run
 
-Install Seiran (`python setup.py install`) and it will be added to your Python `Scripts` folder, `/bin`, etc. depending on your platform. If you like, add its location to your system path so you can use Seiran anywhere just by typing "seiran".
-
-If you run Seiran without arguments, it will ask what you want to do. You can also invoke it with the command you want (e.g. `seiran add`), to save time.
+Install Seiran (`python setup.py install`) and it will be added to your Python `Scripts` folder, `/bin`, etc. depending on your platform. If you like, add its location to your system path so you can use Seiran anywhere just by typing "seiran [command]".
 
 Available commands:
 
@@ -42,6 +40,7 @@ search [bookmarks]
 edit [a bookmark]
 import [bookmarks from various sources]
 export [bookmarks to other formats]
+clean [bookmarks]
 copyright
 help
 ```
@@ -50,13 +49,40 @@ help
 
 Use `add` to add a single new bookmark to the database. You'll be prompted for its title, URL, and optional "folder"/category. (The date of creation will be added automatically.)
 
+Optional arguments:
+
+`-t TITLE, --title TITLE`  
+A bookmark's name. Usually appears in \<h1\> or \<title\> tags on the page.
+
+`-u URL, --url URL`  
+A bookmark's Universal Resource Locator. Must be unique.
+
+`-c CATEGORY, --category CATEGORY`  
+A bookmark's category. This is inspired by Firefox's folders, but you can put almost anything here.
+
 ## Deleting bookmarks
 
 You can remove a bookmark with the `del` command. Please be careful as bookmarks cannot be recovered once they are deleted.
 
+Optional arguments:
+
+`-u URL, --url URL`  
+The Universal Resource Locator of the bookmark you want to delete.
+
 ## Editing bookmarks
 
-Use `edit` to modify an existing bookmark's title or category/tag.
+Use `edit` to modify an existing bookmark's title or category/tag. To avoid shenanigans, URLs cannot be edited in Seiran.
+
+Optional arguments:
+
+`-u URL, --url URL`  
+The Universal Resource Locator of the bookmark you want to edit. Must be unique.
+
+`-f FIELD, --field FIELD`  
+The column you want to edit. Available arguments are `title` or `category`.
+
+`-n NEW, --new NEW`  
+The new value you want an edited field to have.
 
 ## Listing bookmarks
 
@@ -66,19 +92,35 @@ You can see a list of all bookmarks with `list`. This could take a while for ver
 
 `search` allows you to find a specific bookmark based on its title, URL, or category.
 
+`-f FIELD, --field FIELD`  
+The column you want to search. Available arguments are `title`, `url`, `category`, or `all`.
+
+`-q QUERY, --query QUERY`  
+The term you want to search for.
+
 ## Exporting bookmarks
 
 With `export`, you can export your bookmarks to a nicely-formatted, timestamped file. Of course, you can easily get a plain CSV with a simple SQLite command, so Seiran tries to add a bit of value by making its output a bit prettier.
 
 Available formats for exporting include HTML and TXT.
 
+Optional arguments:
+
+`-x EXPORTFORMAT, --exportformat EXPORTFORMAT`  
+The format you want to export your bookmarks to. Available arguments are `txt` or `html`.
+
 ## Importing bookmarks
 
 Although it's experimental, you can import a whole bunch of bookmarks at once with the `import` command. Make sure to back up your existing database before using, just in case.
 
-When you use the `import` command, you'll first be prompted to make sure you really meant to do that -- it could take a long time and add quite a large number of bookmarks to your database (and may still have bugs as well). If you're OK with that, type `y` for yes.
+When you use the `import` command, you'll first be prompted to make sure you *really* meant to do that -- it could take a long time and add quite a large number of bookmarks to your database (and may still have bugs as well). If you're OK with that, type `y` for yes. There is no command-line argument to speed this along, just to make sure no accidents happen.
 
 Next, Seiran supports importation from existing Seiran databases, Firefox (and derivatives, like IceCat), the [OneTab](https://www.one-tab.com/) browser add-on. You'll be asked which one you want to import bookmarks from.
+
+Optional arguments:
+
+`-i IMPORTFORMAT, --importformat IMPORTFORMAT`  
+The system you want to import bookmarks from. Available arguments are `firefox`, `onetab`, or `seiran`.
 
 ### Firefox et al.
 
@@ -108,9 +150,13 @@ If you have another Seiran database and you want to combine it with your main on
 
 Seiran will prompt you for the **full path** to the database you want to import. Provide it and the importation process will begin.
 
+## Cleaning bookmarks
+
+At present, `seiran clean` will look for bookmarks in your database that don't seem to have titles, and add their respective URL as a title instead.
+
 ## License
 
-Copyright 2015-2018 Matthew Ellison.
+Copyright 2015-2019 Matthew Ellison.
 
 This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation; either version 3 of the License, or (at your option) any later version.
 
@@ -118,10 +164,7 @@ This program is distributed in the hope that it will be useful, but WITHOUT ANY 
 
 You should have received a copy of the GNU General Public License along with this program; if not, see <http://www.gnu.org/licenses> or write to:
 
->Free Software Foundation
-
->51 Franklin Street, Fifth Floor
-
->Boston, MA 02110-1335
-
+>Free Software Foundation  
+>51 Franklin Street, Fifth Floor  
+>Boston, MA 02110-1335  
 >USA

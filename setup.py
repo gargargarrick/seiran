@@ -5,11 +5,11 @@ def readme():
         return f.read()
 
 setup(name='seiran',
-      version='1.1',
+      version='1.2.0',
       description='Local bookmarks manager',
       long_description="Save bookmarks to a local SQLite database",
       classifiers=[
-        'Development Status :: 3 - Alpha',
+        'Development Status :: 4 - Beta',
         'License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)',
         'Programming Language :: Python :: 3',
         'Intended Audience :: End Users/Desktop',

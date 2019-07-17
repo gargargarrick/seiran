@@ -1,9 +1,9 @@
 #!/usr/bin/python3
 # -*- coding: utf-8 -*-
 
-##    Seiran 1.0
+##    Seiran 1.2.0
 
-##    Copyright 2015-2018 Matthew "garrick" Ellison.
+##    Copyright 2015-2019 Matthew "garrick" Ellison.
 
 ##    This program is free software: you can redistribute it and/or modify
 ##    it under the terms of the GNU General Public License as published by
@@ -22,9 +22,14 @@
 
 name = "seiran"
 author = "gargargarrick"
-__version__ = '1.0'
+__author__ = "gargargarrick"
+__version__ = '1.2.0'
+__copyright__ = "Copyright 2015-2019 Matthew Ellison"
+__license__ = "GPL"
+__maintainer__ = "gargargarrick"
+__status__ = "Development"
 
-import datetime, os, sys
+import datetime, os, sys, argparse
 import sqlite3
 from appdirs import *
 import seiran.ff_bkm_import
@@ -41,9 +46,11 @@ def initBookmarks():
     except sqlite3.OperationalError:
         print("Database exists.")
 
-def addBKM():
-    title = input("Title? > ")
-    url = input("URL? > ")
+def addBKM(title,url,folder):
+    if title == None:
+        title = input("Title? > ")
+    if url == None:
+        url = input("URL? > ")
 
     ##I don't want to connect to the net to validate bookmarks (that's what browsers
     ##are for) so this only looking the first few characters and does absolutely
@@ -57,7 +64,8 @@ def addBKM():
         url = input("URL? > ")
     ##add the current date
     date = datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%S.%f%z")
-    folder = input("Folder/Category? (can be left blank) > ")
+    if folder == None:
+        folder = input("Folder/Category? (can be left blank) > ")
     bkm = (title,url,date,folder)
     ##Frankly, I don't know how necessary SQL injection countermeasures are for
     ##this specific program (what, are you going to inject your OWN database?)
@@ -74,7 +82,8 @@ def addBKM():
         print("Operational error")
 
 def delBKM():
-    url = input("URL to delete? (Deleted bookmarks cannot be recovered!) > ")
+    if url == None:
+        url = input("URL to delete? (Deleted bookmarks cannot be recovered!) > ")
     url = (url,)
     try:
         c.execute("DELETE FROM bookmarks WHERE url=?",url)
@@ -86,9 +95,10 @@ def delBKM():
 
 ## List all bookmarks in the database.
 ## You can normally do that by dumping a CSV, so I made it a bit fancy.
+## The spaces at the ends of lines are so that it parses as Markdown too.
 def listBKMs():
     c.execute("SELECT * from bookmarks")
-    template = "\nTitle: {title}\n  URL: {url}\n  Date: {date}\n  Folder: {folder}"
+    template = "\nTitle: {title}  \n  URL: {url}  \n  Date: {date}  \n  Folder: {folder}"
     for i in c.fetchall():
         print(template.format(title=i[0],url=i[1],date=i[2],folder=i[3]))
 
@@ -110,7 +120,7 @@ def oneSearch(search_term,column):
         for i in result_list:
             print(template.format(title=i[0],url=i[1],date=i[2],folder=i[3]))
 
-## Search titles and URLs in one go.
+## Search titles URLs, and categories in one go.
 def searchAll(search_term):
     search_term = "%"+search_term+"%"
     t = (search_term,)
@@ -132,13 +142,14 @@ def searchAll(search_term):
     if results == []:
         print("No results.")
     else:
-        template = "\nTitle: {title}\n  URL: {url}\n  Date: {date}\n  Folder: {folder}"
+        template = "\nTitle: {title}  \n  URL: {url}  \n  Date: {date}  \n  Folder: {folder}"
         for i in results:
             print(template.format(title=i[0],url=i[1],date=i[2],folder=i[3]))
 
 ## Edit a bookmark.
-def editBKM():
-    url = input("Which URL do you want to edit? > ")
+def editBKM(url,field,new):
+    if url == None:
+        url = input("Which URL do you want to edit? > ")
     urlT = (url,)
     c.execute("SELECT * from bookmarks WHERE url = ?",urlT)
     ##error handling goes here
@@ -149,18 +160,18 @@ def editBKM():
     if you_found_it == False:
         print("Sorry, that doesn't seem to be a URL in the database. Try again.")
         return
-    ## TODO: Let peoples leave without changing anything
-    editField = input("Which field do you wish to edit? (title/category)> ")
-    if editField.lower() == "title":
-        new_title = input("What should the new title be? > ")
-        new_title = str(new_title)
-        newBKM = (new_title,url)
+    if field == None:
+        field = input("Which field do you wish to edit? (title/category/none)> ")
+    if field not in ["title", "category"]:
+        return
+    if new == None:
+        new = input("What should the new {field} be? > ".format(field=field))
+        new = str(new)
+    newBKM = (new,url)
+    if field == "title":
         c.execute("UPDATE bookmarks SET title=? WHERE url=?",newBKM)
         conn.commit()
-    elif editField.lower() == "category":
-        new_cat = input("What should the new category be? > ")
-        new_cat = str(new_cat)
-        newBKM = (new_cat,url)
+    elif field == "category":
         c.execute("UPDATE bookmarks SET folder=? WHERE url=?",newBKM)
         conn.commit()
     else:
@@ -228,12 +239,12 @@ def exportBookmarks(format):
     c.execute("SELECT * from bookmarks")
     if format == "txt":
         ## Using the same format as [list]
-        template = "Title: {title}\n  URL: {url}\n  Date: {date}\n  Folder: {folder}\n"
+        template = "Title: {title}  \n  URL: {url}  \n  Date: {date}  \n  Folder: {folder}\n"
     elif format == "html":
         template = "<p><a href={url}>{title}</a> ({folder}) [<time='{date}'>{date}</a>]</p>"
     bookmarks = []
     for i in c.fetchall():
-        if i[0] == "":
+        if i[0] == "" or i[0] == None or i[0] == "None":
             title=i[1]
         else:
             title = i[0]
@@ -254,6 +265,19 @@ def exportBookmarks(format):
     print("Exported to {bookmarks_out}.".format(bookmarks_out=bookmarks_out))
     return
 
+def cleanBKMs():
+    c.execute("SELECT * from bookmarks")
+    for i in c.fetchall():
+        ## I'd eventually like this to clean up duplicates (the same but with
+        ## a slash at the end, etc.) but for now this is all it checks for.
+        if i[0] == "" or i[0] == None or i[0] == "None":
+            print("Bookmark {url} doesn't have a title. Adding URL as title.".format(url=i[1]))
+            new_title = i[1]
+            newBKM = (new_title,i[1])
+            c.execute("UPDATE bookmarks SET title=? WHERE url=?",newBKM)
+            conn.commit()
+    return
+
 ## Stick Seiran in the user's data directory,
 ## and get the path to the bookmarks database.
 def installToConfig():
@@ -270,24 +294,49 @@ def main():
     conn = sqlite3.connect(bookmarks_file)
     c = conn.cursor()
     initBookmarks()
+    print("{name} by {author}, v.{version}.".format(name=name,author=__author__,version=__version__))
+    
+    parser = argparse.ArgumentParser(prog='seiran')
+    subparsers = parser.add_subparsers(dest="command", help='Commands')
+    parser_help = subparsers.add_parser("help", help="List commands")
+    parser_add = subparsers.add_parser("add", help="Create a new bookmark.")
+    parser_del = subparsers.add_parser("del", help="Remove a bookmark.")
+    parser_list = subparsers.add_parser("list", help="Display all bookmarks in the database.")
+    parser_search = subparsers.add_parser("search", help="Find specific bookmark(s).")
+    parser_edit = subparsers.add_parser("edit", help="Change a bookmark's metadata.")
+    parser_import = subparsers.add_parser("import", help="Add bookmarks from anothe system to the database.")
+    parser_export = subparsers.add_parser("export", help="Save all bookmarks to a formatted file.")
+    parser_clean = subparsers.add_parser("clean", help="Tidy up bookmark metadata.")
+    parser_copyright = subparsers.add_parser("copyright", help="Show legal information.")
+    
+    parser_add.add_argument("-t", "--title", help="A bookmark's name. Usually appears in <h1> or <title> tags on the page.")
+    parser_add.add_argument("-u", "--url", help="A bookmark's Universal Resource Locator. Must be unique.")
+    parser_edit.add_argument("-u", "--url", help="A bookmark's Universal Resource Locator. Must be unique.")
+    parser_del.add_argument("-u", "--url", help="The Universal Resource Locator of the bookmark you want to delete.")
+    parser_add.add_argument("-c", "--category", help="A bookmark's category. This is inspired by Firefox's folders, but you can put almost anything here.")
+    parser_search.add_argument("-f", "--field", help="The column you want to search. Available arguments are title, url, category, or all.")
+    parser_edit.add_argument("-f", "--field", help="The column you want to edit. Available arguments are title or category.")
+    parser_search.add_argument("-q", "--query", help="The term you want to search for.")
+    parser_edit.add_argument("-n", "--new", help="The new value you want an edited field to have.")
+    parser_import.add_argument("-i", "--importformat", help="The system you want to import bookmarks from. Available arguments are firefox, onetab, or seiran.")
+    parser_export.add_argument("-x", "--exportformat", help="The format you want to export your bookmarks to. Available options are txt or html.")
+    choice = parser.parse_args()
 
-    ## Use with the command line or don't!
-    if len(sys.argv) <= 1:
-        choice = input("Action? (add, del, list, search, edit, import, export, copyright, help) > ")
-    else:
-        choice = sys.argv[1]
-
-    if choice.lower() == "add":
-        addBKM()
-    elif choice.lower() == "del":
-        delBKM()
-    elif choice.lower() == "list":
+    if choice.command == "add":
+        addBKM(choice.title, choice.url, choice.category)
+    elif choice.command == "del":
+        delBKM(choice.url)
+    elif choice.command == "list":
         print("Listing all bookmarks...")
         listBKMs()
         return
-    elif choice.lower() == "search":
-        field = input("  Which field? (title/url/category/all) > ")
-        search_term = input("  Search term? (case insensitive) > ")
+    elif choice.command == "search":
+        field = choice.field
+        if field == None:
+            field = input("  Which field? (title/url/category/all) > ")
+        search_term = choice.query
+        if search_term == None:
+            search_term = input("  Search term? (case insensitive) > ")
         if field == "title":
             oneSearch(search_term,"title")
         elif field == "url":
@@ -299,12 +348,16 @@ def main():
         else:
             searchAll(search_term)
             return
-    elif choice.lower() == "edit":
-        editBKM()
-    elif choice.lower() == "import":
+    elif choice.command == "edit":
+        editBKM(choice.url,choice.field,choice.new)
+    elif choice.command == "import":
+        ## This has a big enough possibility to mess things up that I'm not adding an
+        ## argument to do it automatically. You must accept manually to avoid accidents.
         ic = input("Are you sure you want to import bookmarks? It might take a while. Back up your database first! (y/n) > ")
         if ic.lower() == "y" or ic.lower() == "yes":
-            importer_c = input("Import from Firefox-type browser, OneTab export, or another Seiran database? (firefox/onetab/seiran) > ")
+            importer_c = choice.importformat
+            if importer_c == None:
+                importer_c = input("Import from Firefox-type browser, OneTab export, or another Seiran database? (firefox/onetab/seiran) > ")
             if importer_c == "firefox":
                 getFirefoxBookmarks()
                 return
@@ -316,8 +369,10 @@ def main():
                 return
         else:
             print("OK, nothing will be copied.")
-    elif choice.lower() == "export":
-        ex_form = input("Which format? (html,txt) > ")
+    elif choice.command == "export":
+        ex_form = choice.exportformat
+        if ex_form == None:
+            ex_form = input("Which format? (html,txt) > ")
         if ex_form == "html":
             exportBookmarks("html")
             return
@@ -327,10 +382,13 @@ def main():
         else:
             print("Export cancelled.")
             return
-    elif choice.lower() == "copyright":
-        print("Copyright 2015-2018 Matthew 'garrick' Ellison. Released under the GNU GPL version 3.")
-    elif choice.lower() == "help":
-        print("Available arguments: add [a bookmark], del[ete a bookmark], list [all bookmarks], search [bookmarks], edit [a bookmark], import [bookmarks from other system], export [bookmarks to other formats], copyright, help")
+    elif choice.command == "clean":
+        cleanBKMs()
+        return
+    elif choice.command == "copyright":
+        print("Copyright 2015-2019 Matthew 'gargargarrick' Ellison. Released under the GNU GPL version 3. See LICENSE for full details.")
+    elif choice.command == "help":
+        print("Available arguments: add [a bookmark], del[ete a bookmark], list [all bookmarks], search [bookmarks], edit [a bookmark], import [bookmarks from other system], export [bookmarks to other formats], clean [bookmark metadata], copyright, help")
     else:
         conn.close()
 
