@@ -33,7 +33,8 @@ Install Seiran (`python setup.py install`) and it will be added to your Python `
 
 Available commands:
 
-```add [a bookmark]
+```
+add [a bookmark]
 del[ete a bookmark]
 list [all bookmarks]
 search [bookmarks]
