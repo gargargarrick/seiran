@@ -153,7 +153,7 @@ Seiran will prompt you for the **full path** to the database you want to import.
 
 ## Cleaning bookmarks
 
-At present, `seiran clean` will look for bookmarks in your database that don't seem to have titles, and add their respective URL as a title instead.
+`seiran clean` will look for bookmarks in your database that don't seem to have titles, and add their respective URL as a title instead. It will then look for bookmarks that have identical titles (which suggests they might be duplicates) and tell you if it finds any.
 
 ## License
 

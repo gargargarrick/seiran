@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 # -*- coding: utf-8 -*-
 
-##    Seiran 1.2.0
+##    Seiran 1.3.0
 
 ##    Copyright 2015-2019 Matthew "garrick" Ellison.
 
@@ -23,7 +23,7 @@
 name = "seiran"
 author = "gargargarrick"
 __author__ = "gargargarrick"
-__version__ = '1.2.0'
+__version__ = '1.3.0'
 __copyright__ = "Copyright 2015-2019 Matthew Ellison"
 __license__ = "GPL"
 __maintainer__ = "gargargarrick"
@@ -268,14 +268,26 @@ def exportBookmarks(format):
 def cleanBKMs():
     c.execute("SELECT * from bookmarks")
     for i in c.fetchall():
-        ## I'd eventually like this to clean up duplicates (the same but with
-        ## a slash at the end, etc.) but for now this is all it checks for.
+        # This functiom checks for empty and duplicate titles.
         if i[0] == "" or i[0] == None or i[0] == "None":
             print("Bookmark {url} doesn't have a title. Adding URL as title.".format(url=i[1]))
             new_title = i[1]
             newBKM = (new_title,i[1])
             c.execute("UPDATE bookmarks SET title=? WHERE url=?",newBKM)
             conn.commit()
+    c.execute("SELECT title, COUNT(*) c FROM bookmarks GROUP BY title HAVING c > 1;")
+    result_list = c.fetchall()
+    if result_list == []:
+        print("No results.")
+    else:
+        template = """\n{count} bookmarks have the title "{title}":"""
+        for i in result_list:
+            print(template.format(title=i[0],count=i[1]))
+            t = (i[0],)
+            c.execute("SELECT url from bookmarks where title is ?",t)
+            url_list = c.fetchall()
+            for u in url_list:
+                print("  - {url}".format(url=u[0]))
     return
 
 ## Stick Seiran in the user's data directory,
