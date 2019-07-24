@@ -1,5 +1,9 @@
 # Seiran Changelog
 
+## 1.3.1
+
++ Fixed a bug where `seiran del` no longer worked correctly
+
 ## 1.3.0
 + `seiran clean` now checks if any bookmarks have identical titles.
 + Changelog created.

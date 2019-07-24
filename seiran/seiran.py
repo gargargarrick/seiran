@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 # -*- coding: utf-8 -*-
 
-##    Seiran 1.3.0
+##    Seiran 1.3.1
 
 ##    Copyright 2015-2019 Matthew "garrick" Ellison.
 
@@ -23,7 +23,7 @@
 name = "seiran"
 author = "gargargarrick"
 __author__ = "gargargarrick"
-__version__ = '1.3.0'
+__version__ = '1.3.1'
 __copyright__ = "Copyright 2015-2019 Matthew Ellison"
 __license__ = "GPL"
 __maintainer__ = "gargargarrick"
@@ -81,7 +81,7 @@ def addBKM(title,url,folder):
     except sqlite3.OperationalError:
         print("Operational error")
 
-def delBKM():
+def delBKM(url):
     if url == None:
         url = input("URL to delete? (Deleted bookmarks cannot be recovered!) > ")
     url = (url,)
