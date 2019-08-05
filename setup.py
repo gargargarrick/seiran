@@ -1,13 +1,15 @@
 from setuptools import setup
+from os import path
 
-def readme():
-    with open('README') as f:
-        return f.read()
+this_directory = path.abspath(path.dirname(__file__))
+with open(path.join(this_directory, 'README.md'), encoding='utf-8') as f:
+    long_description = f.read()
 
 setup(name='seiran',
-      version='1.3.1git',
+      version='1.3.2git',
       description='Local bookmarks manager',
-      long_description="Save bookmarks to a local SQLite database",
+      long_description=long_description,
+      long_description_content_type='text/markdown',
       classifiers=[
         'Development Status :: 4 - Beta',
         'License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)',
