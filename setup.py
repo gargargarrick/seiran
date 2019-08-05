@@ -5,7 +5,7 @@ def readme():
         return f.read()
 
 setup(name='seiran',
-      version='1.3.1',
+      version='1.3.1git',
       description='Local bookmarks manager',
       long_description="Save bookmarks to a local SQLite database",
       classifiers=[

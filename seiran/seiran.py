@@ -116,7 +116,7 @@ def oneSearch(search_term,column):
     if result_list == []:
         print("No results.")
     else:
-        template = "\nTitle: {title}\n  URL: {url}\n  Date: {date}\n  Folder: {folder}"
+        template = "\nTitle: {title}  \n  URL: {url}  \n  Date: {date}  \n  Folder: {folder}"
         for i in result_list:
             print(template.format(title=i[0],url=i[1],date=i[2],folder=i[3]))
 
