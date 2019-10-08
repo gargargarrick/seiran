@@ -1,5 +1,9 @@
 # Seiran Changelog
 
+## 1.3.3
+
++ `seiran edit` now displays the active bookmark's information properly (like other commands do)
+
 ## 1.3.2
 
 + Fixed wrong filename for readme in `setup.py`

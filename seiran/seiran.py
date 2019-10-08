@@ -23,7 +23,7 @@
 name = "seiran"
 author = "gargargarrick"
 __author__ = "gargargarrick"
-__version__ = '1.3.2'
+__version__ = '1.3.3'
 __copyright__ = "Copyright 2015-2019 Matthew Ellison"
 __license__ = "GPL"
 __maintainer__ = "gargargarrick"
@@ -123,22 +123,12 @@ def oneSearch(search_term,column):
 ## Search titles URLs, and categories in one go.
 def searchAll(search_term):
     search_term = "%"+search_term+"%"
-    t = (search_term,)
+    t = (search_term,search_term,search_term,)
     results = []
-    c.execute("SELECT * from bookmarks WHERE title LIKE ?",t)
+    c.execute("SELECT DISTINCT * from bookmarks WHERE title LIKE ? OR url LIKE ? OR folder LIKE ?",t)
     result_list = c.fetchall()
     for i in result_list:
         results.append(i)
-    c.execute("SELECT * from bookmarks WHERE url LIKE ?",t)
-    result_list = c.fetchall()
-    for i in result_list:
-        if i not in results:
-            results.append(i)
-    c.execute("SELECT * from bookmarks WHERE folder LIKE ?",t)
-    result_list = c.fetchall()
-    for i in result_list:
-        if i not in results:
-            results.append(i)
     if results == []:
         print("No results.")
     else:
@@ -155,7 +145,7 @@ def editBKM(url,field,new):
     ##error handling goes here
     you_found_it = False
     for row in c:
-        print(row)
+        print("\nTitle: {title}  \n  URL: {url}  \n  Date: {date}  \n  Folder: {folder}".format(title=row[0],url=row[1],date=row[2],folder=row[3]))
         you_found_it = True
     if you_found_it == False:
         print("Sorry, that doesn't seem to be a URL in the database. Try again.")
@@ -229,8 +219,6 @@ def getSeiranBookmarks():
     c.execute(attach_branch,branch_db)
     c.execute("INSERT OR IGNORE INTO x.bookmarks SELECT * FROM y.bookmarks;")
     conn.commit()
-    # except sqlite3.OperationalError:
-    #     print("Operational error")
     print("Import complete!")
     return
     
@@ -268,13 +256,14 @@ def exportBookmarks(format):
 def cleanBKMs():
     c.execute("SELECT * from bookmarks")
     for i in c.fetchall():
-        # This functiom checks for empty and duplicate titles.
+        # This function checks for empty and duplicate titles.
         if i[0] == "" or i[0] == None or i[0] == "None":
             print("Bookmark {url} doesn't have a title. Adding URL as title.".format(url=i[1]))
             new_title = i[1]
             newBKM = (new_title,i[1])
             c.execute("UPDATE bookmarks SET title=? WHERE url=?",newBKM)
             conn.commit()
+    ## And this one checks for ones that might be duplicates.
     c.execute("SELECT title, COUNT(*) c FROM bookmarks GROUP BY title HAVING c > 1;")
     result_list = c.fetchall()
     if result_list == []:

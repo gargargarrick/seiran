@@ -6,7 +6,7 @@ with open(path.join(this_directory, 'README.md'), encoding='utf-8') as f:
     long_description = f.read()
 
 setup(name='seiran',
-      version='1.3.2git',
+      version='1.3.3',
       description='Local bookmarks manager',
       long_description=long_description,
       long_description_content_type='text/markdown',
