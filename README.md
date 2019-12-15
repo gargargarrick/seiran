@@ -1,3 +1,5 @@
+**This repository is not currently updated due to GitHub's contract with ICE. Please check [my website](https://www.twinkle-night.net/Code/seiran.html) for the latest version of this software.**
+
 # Seiran
 
 ![Seiran](icon.svg)
